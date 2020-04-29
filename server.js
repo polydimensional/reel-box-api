@@ -61,20 +61,15 @@ app.get('/search_with_id', (req, res) => {
     omdb.get({
         id: id,
     }).then(result => {
-        console.log('got response:', result);
+        // console.log('got response:', result);
         const resultArray = [];
+        // have to change the condition in according to what we show in front end
         if (result.title && result.year && result.actors && result.director && result.plot && resultArray.length < 3) {
-            resultArray.push({
-                actors: result.actors,
-                director: result.director,
-                plot: result.plot,
-                title: result.title,
-                year: result.year,
-            });
+            resultArray.push(result);
         }
 
         return res.status(200).send({
-            data: result
+            data: resultArray
         });
     }).catch(err => {
         console.log('there was a problem in getting data', err);
