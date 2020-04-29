@@ -1,8 +1,11 @@
 const express = require('express');
 const app = express();
 
-const dotenv = require('dotenv')
-dotenv.config()
+const dotenv = require('dotenv');
+dotenv.config();
+
+const cors = require('cors');
+app.use(cors());
 
 const port = process.env.PORT || 1234;
 
@@ -24,15 +27,25 @@ app.get('/search_with_keyword', (req, res) => {
         search: title,
     }).then(result => {
         // console.log('got response:', result);
+        const resultArray = [];
+        for (let i in result) {
+            if (result[i].title && result[i].year && result[i].imdbid && result[i].poster && resultArray.length < 3) {
+                resultArray.push({
+                    title: result[i].title,
+                    poster: result[i].poster,
+                    id: result[i].imdbid
+                });
+            }
+        }
 
         return res.status(200).send({
-            result: result
+            data: resultArray
         });
     }).catch(err => {
         console.log('there was a problem in getting data', err);
 
         return res.status(200).send({
-            result: 'error in retreaving result from ombd api'
+            data: 'error in retreaving result from ombd api'
         });
     })
 });
@@ -48,16 +61,26 @@ app.get('/search_with_id', (req, res) => {
     omdb.get({
         id: id,
     }).then(result => {
-        // console.log('got response:', result);
+        console.log('got response:', result);
+        const resultArray = [];
+        if (result.title && result.year && result.actors && result.director && result.plot && resultArray.length < 3) {
+            resultArray.push({
+                actors: result.actors,
+                director: result.director,
+                plot: result.plot,
+                title: result.title,
+                year: result.year,
+            });
+        }
 
         return res.status(200).send({
-            result: result
+            data: result
         });
     }).catch(err => {
         console.log('there was a problem in getting data', err);
 
         return res.status(200).send({
-            result: 'error in retreaving result from ombd api'
+            data: 'error in retreaving result from ombd api'
         });
     })
 });
