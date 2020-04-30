@@ -7,6 +7,29 @@ dotenv.config();
 const cors = require('cors');
 app.use(cors());
 
+const bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({
+    extended: false
+}));
+app.use(bodyParser.json());
+
+const { Pool } = require('pg');
+const pool = new Pool({
+    user: `${process.env.user}`,
+    host: `${process.env.host}`,
+    database: `${process.env.database}`,
+    password: `${process.env.password}`,
+    port: '5432',
+    ssl: {
+        require: true,
+        rejectUnauthorized: false,
+    }
+});
+
+const jwt = require('jsonwebtoken');
+
+const randomize = require('randomatic');
+
 const port = process.env.PORT || 1234;
 
 const omdb = new (require('omdbapi'))(process.env.omdbApiKey);
@@ -78,6 +101,97 @@ app.get('/search_with_id', (req, res) => {
             data: 'error in retreaving result from ombd api'
         });
     })
+});
+
+app.post('/new_user', async (req, res) => {
+    if (!req.body.name) {
+        return res.status(500).send({
+            msg: 'Missing name'
+        });
+    }
+
+    const id = randomize('a0', 4);
+    const token = jwt.sign({
+        name: req.body.name,
+        user_id: id
+    }, process.env.jwtSecret, {
+        expiresIn: 86400000 * 30 // 30 days
+    });
+
+    const client = await pool.connect();
+    await client.query('insert into movie_challenge_users (id, name, created_at) values ($1, $2, now())',
+        [id, req.body.name]).then(result => {
+            return res.status(200).send({
+                msg: 'User created',
+                token: token,
+                id: id
+            });
+        }).catch(err => {
+            console.log('error in creating user', err);
+            return res.status(500).send({
+                msg: 'Internal Error'
+            });
+        });
+    client.release();
+});
+
+app.post('/create_collection', async(req, res) => {
+    const decodedToken = await decodeJwt(req.headers['token']);
+    let userIdArray = [];
+    let nameArray = [];
+    let ratingArray = [];
+    let languageArray = [];
+
+    req.body.collection.forEach(element => {
+        userIdArray.push(decodedToken.user_id);
+        nameArray.push(element.name);
+        ratingArray.push(element.rating);
+        languageArray.push(element.language);
+    });
+
+    const client = await pool.connect();
+    await client.query('insert INTO movie_collection (name, language, rating, user_id) select * FROM unnest ($1::text[], $2::text[], $3::text[], $4::text[])',
+        [nameArray, languageArray, ratingArray, userIdArray]).then(result => {
+            // console.log('inserted')
+            return res.status(200).send({
+                msg: 'Collection created',
+                url: 'frontendRoute/' + decodedToken.user_id
+            });
+        }).catch(err => {
+            console.log('error in creating user', err);
+            return res.status(500).send({
+                msg: 'Internal Error'
+            });
+        });
+    client.release();
+
+    function decodeJwt (token) {
+        if (!token) {
+            return res.status(403).send({
+                message: 'No token provided.'
+            });
+        }
+
+        return jwt.verify(token, process.env.jwtSecret, function (err, decoded) {
+            if (err && err.name === 'TokenExpiredError') {
+                return res.status(200).send({
+                    message: 'Token Expired'
+                });
+            } else if (err) {
+                console.log('Failed to authenticate token', err);
+                return res.status(500).send({
+                    message: 'Failed to authenticate token.'
+                });
+            }
+
+            const decodedToken = {
+                name: decoded.name,
+                user_id: decoded.user_id
+            };
+   
+            return decodedToken;
+        });
+    }
 });
 
 app.listen(port, () => {
