@@ -49,7 +49,6 @@ app.get('/search_with_keyword', (req, res) => {
     omdb.search({
         search: title,
     }).then(result => {
-        // console.log('got response:', result);
         const resultArray = [];
         for (let i in result) {
             if (result[i].title && result[i].year && result[i].imdbid && result[i].poster && resultArray.length < 3) {
@@ -84,7 +83,6 @@ app.get('/search_with_id', (req, res) => {
     omdb.get({
         id: id,
     }).then(result => {
-        // console.log('got response:', result);
         const resultArray = [];
         // have to change the condition in according to what we show in front end
         if (result.title && result.year && result.actors && result.director && result.plot && resultArray.length < 3) {
@@ -119,7 +117,7 @@ app.post('/new_user', async (req, res) => {
     });
 
     const client = await pool.connect();
-    await client.query('insert into movie_challenge_users (id, name, created_at) values ($1, $2, now())',
+    await client.query('insert into movie_challenge_users (id, name) values ($1, $2)',
         [id, req.body.name]).then(result => {
             return res.status(200).send({
                 msg: 'User created',
@@ -135,7 +133,7 @@ app.post('/new_user', async (req, res) => {
     client.release();
 });
 
-app.post('/create_collection', async(req, res) => {
+app.post('/create_collection', async (req, res) => {
     const decodedToken = await decodeJwt(req.headers['token']);
     let userIdArray = [];
     let nameArray = [];
@@ -152,10 +150,9 @@ app.post('/create_collection', async(req, res) => {
     const client = await pool.connect();
     await client.query('insert INTO movie_collection (name, language, rating, user_id) select * FROM unnest ($1::text[], $2::text[], $3::text[], $4::text[])',
         [nameArray, languageArray, ratingArray, userIdArray]).then(result => {
-            // console.log('inserted')
             return res.status(200).send({
                 msg: 'Collection created',
-                url: 'frontendRoute/' + decodedToken.user_id
+                id: decodedToken.user_id
             });
         }).catch(err => {
             console.log('error in creating user', err);
@@ -165,7 +162,7 @@ app.post('/create_collection', async(req, res) => {
         });
     client.release();
 
-    function decodeJwt (token) {
+    function decodeJwt(token) {
         if (!token) {
             return res.status(403).send({
                 message: 'No token provided.'
@@ -188,10 +185,33 @@ app.post('/create_collection', async(req, res) => {
                 name: decoded.name,
                 user_id: decoded.user_id
             };
-   
+
             return decodedToken;
         });
     }
+});
+
+app.get('/collections/:id', async (req, res) => {
+    const id = req.params.id;
+
+    const client = await pool.connect();
+    await client.query('select * from movie_collection where user_id = $1', [id]).then(result => {
+        if (result.rowCount > 1) {
+            return res.status(200).send({
+                data: result.rows
+            });
+        } else {
+            return res.status(200).send({
+                data: 'No collections found'
+            });
+        }
+    }).catch(err => {
+        console.log('error in retreaving collection', err);
+        return res.status(500).send({
+            msg: 'Internal Error'
+        });
+    });
+    client.release();
 });
 
 app.listen(port, () => {

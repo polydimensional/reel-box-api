@@ -1,7 +1,7 @@
 create table movie_challenge_users (
     id text not null,
     name text not null,
-    created_at TIMESTAMP not null,
+    created_at TIMESTAMP DEFAULT now() not null,
     PRIMARY KEY (id)
 );
 
@@ -10,6 +10,7 @@ create table movie_collection (
     language text,
     rating text,
     user_id text not null,
+    created_at TIMESTAMP DEFAULT now(),
     FOREIGN KEY (user_id) REFERENCES movie_challenge_users (id)
 );
 
