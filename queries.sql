@@ -6,9 +6,17 @@ create table movie_challenge_users (
 );
 
 create table movie_collection (
-    name text,
-    language text,
-    rating text,
+    name text DEFAULT '-',
+    year text DEFAULT '-',
+    rating text DEFAULT '-',
+    actors text DEFAULT '-',
+    directors text DEFAULT '-',
+    plot text DEFAULT '-',
+    runtime text DEFAULT '-',
+    genre text DEFAULT '-',
+    awards text DEFAULT '-',
+    language text DEFAULT '-',
+    poster text DEFAULT '-',
     user_id text not null,
     created_at TIMESTAMP DEFAULT now(),
     FOREIGN KEY (user_id) REFERENCES movie_challenge_users (id)

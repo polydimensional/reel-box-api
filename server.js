@@ -139,17 +139,37 @@ app.post('/create_collection', async (req, res) => {
     let nameArray = [];
     let ratingArray = [];
     let languageArray = [];
+    let yearArray = [];
+    let actorArray = [];
+    let directorsArray = [];
+    let plotArray = [];
+    let runtimeArray = [];
+    let genreArray = [];
+    let awardsArray = [];
+    let posterArray = [];
 
     req.body.collection.forEach(element => {
         userIdArray.push(decodedToken.user_id);
         nameArray.push(element.name);
         ratingArray.push(element.rating);
         languageArray.push(element.language);
+        yearArray.push(element.year);
+        actorArray.push(element.actors);
+        directorsArray.push(element.directors);
+        plotArray.push(element.plot);
+        runtimeArray.push(element.runtime);
+        genreArray.push(element.genre);
+        awardsArray.push(element.awards);
+        posterArray.push(element.poster);
     });
 
     const client = await pool.connect();
-    await client.query('insert INTO movie_collection (name, language, rating, user_id) select * FROM unnest ($1::text[], $2::text[], $3::text[], $4::text[])',
-        [nameArray, languageArray, ratingArray, userIdArray]).then(result => {
+    await client.query(`insert INTO movie_collection (name, language, rating, user_id, year, actors, 
+        directors, plot, runtime, genre, awards, poster) 
+    select * FROM unnest ($1::text[], $2::text[], $3::text[], $4::text[], $5::text[], $6::text[], 
+        $7::text[], $8::text[], $9::text[], $10::text[], $11::text[], $12::text[])`,
+        [nameArray, languageArray, ratingArray, userIdArray, yearArray, actorArray, directorsArray, 
+            plotArray, runtimeArray, genreArray, awardsArray, posterArray]).then(() => {
             return res.status(200).send({
                 msg: 'Collection created',
                 id: decodedToken.user_id
