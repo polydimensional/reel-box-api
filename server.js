@@ -57,6 +57,12 @@ app.get('/search_with_keyword', (req, res) => {
                     poster: result[i].poster,
                     id: result[i].imdbid
                 });
+            } else {
+                resultArray.push({
+                    id: 'not found',
+                    poster: 'https://img.icons8.com/dotty/80/000000/nothing-found.png',
+                    title: 'No movies found for the given keyword ' + title
+                });
             }
         }
 
@@ -68,7 +74,7 @@ app.get('/search_with_keyword', (req, res) => {
         const resultArray = [];
         resultArray.push({
             id: 'not found',
-            poster: 'dummy pic',
+            poster: 'https://img.icons8.com/dotty/80/000000/nothing-found.png',
             title: 'No movies found for the given keyword ' + title
         });
 
@@ -168,11 +174,11 @@ app.post('/create_collection', async (req, res) => {
 
     const client = await pool.connect();
     await client.query(`insert INTO movie_collection (name, language, rating, user_id, year, actors, 
-        directors, plot, runtime, genre, awards, poster) 
+        directors, plot, runtime, poster) 
     select * FROM unnest ($1::text[], $2::text[], $3::text[], $4::text[], $5::text[], $6::text[], 
-        $7::text[], $8::text[], $9::text[], $10::text[], $11::text[], $12::text[])`,
+        $7::text[], $8::text[], $9::text[], $10::text[])`,
         [nameArray, languageArray, ratingArray, userIdArray, yearArray, actorArray, directorsArray, 
-            plotArray, runtimeArray, genreArray, awardsArray, posterArray]).then(() => {
+            plotArray, runtimeArray, posterArray]).then(() => {
             return res.status(200).send({
                 msg: 'Collection created',
                 id: decodedToken.user_id
@@ -218,7 +224,7 @@ app.get('/collections/:id', async (req, res) => {
     const id = req.params.id;
 
     const client = await pool.connect();
-    await client.query('select * from movie_collection where user_id = $1 order by created_at desc', [id]).then(result => {
+    await client.query('select * from all_collections where user_id_ = $1 order by created_at desc', [id]).then(result => {
         if (result.rowCount > 1) {
             return res.status(200).send({
                 data: result.rows

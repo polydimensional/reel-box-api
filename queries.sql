@@ -13,8 +13,6 @@ create table movie_collection (
     directors text DEFAULT '-',
     plot text DEFAULT '-',
     runtime text DEFAULT '-',
-    genre text DEFAULT '-',
-    awards text DEFAULT '-',
     language text DEFAULT '-',
     poster text DEFAULT '-',
     user_id text not null,
@@ -22,6 +20,21 @@ create table movie_collection (
     FOREIGN KEY (user_id) REFERENCES movie_challenge_users (id)
 );
 
--- INSERT INTO movie_collection(user_id, name) 
--- SELECT 'l7t1' user_id, x
--- FROM    unnest(ARRAY[1,2,3,4,5,6,7,8,22,33]) x;
+-- drop view if EXISTS all_collections;
+-- create view all_collections as 
+
+select 
+c.name name_,
+c.year year_,
+c.rating rating,
+c.actors actors,
+c.directors directors,
+c.plot plot,
+c.runtime runtime,
+c.language language_,
+c.poster poster,
+c.user_id user_id_,
+c.created_at created_at,
+u.name user_name_
+from movie_collection c
+inner join movie_challenge_users u on c.user_id = u.id;
