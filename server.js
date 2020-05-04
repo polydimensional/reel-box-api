@@ -57,13 +57,15 @@ app.get('/search_with_keyword', (req, res) => {
                     poster: result[i].poster,
                     id: result[i].imdbid
                 });
-            } else {
-                resultArray.push({
-                    id: 'not found',
-                    poster: 'https://img.icons8.com/dotty/80/000000/nothing-found.png',
-                    title: 'No movies found for the given keyword ' + title
-                });
             }
+        }
+
+        if (resultArray === 0) {
+            resultArray.push({
+                id: 'not found',
+                poster: 'https://img.icons8.com/dotty/80/000000/nothing-found.png',
+                title: 'No movies found for the given keyword ' + title
+            });
         }
 
         return res.status(200).send({
