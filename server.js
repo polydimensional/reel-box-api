@@ -51,7 +51,7 @@ app.get('/search_with_keyword', (req, res) => {
     }).then(result => {
         const resultArray = [];
         for (let i in result) {
-            if (result[i].title && result[i].year && result[i].imdbid && result[i].poster && resultArray.length < 3) {
+            if (result[i].title && result[i].imdbid && result[i].poster && resultArray.length < 3) {
                 resultArray.push({
                     title: result[i].title,
                     poster: result[i].poster,
@@ -65,9 +65,15 @@ app.get('/search_with_keyword', (req, res) => {
         });
     }).catch(err => {
         console.log('there was a problem in getting data', err);
+        const resultArray = [];
+        resultArray.push({
+            id: 'not found',
+            poster: 'dummy pic',
+            title: 'No movies found for the given keyword ' + title
+        });
 
         return res.status(200).send({
-            data: 'error in retreaving result from ombd api'
+            data: resultArray
         });
     })
 });
