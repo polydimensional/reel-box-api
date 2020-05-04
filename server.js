@@ -218,7 +218,7 @@ app.get('/collections/:id', async (req, res) => {
     const id = req.params.id;
 
     const client = await pool.connect();
-    await client.query('select * from movie_collection where user_id = $1', [id]).then(result => {
+    await client.query('select * from movie_collection where user_id = $1 order by created_at desc', [id]).then(result => {
         if (result.rowCount > 1) {
             return res.status(200).send({
                 data: result.rows
