@@ -227,7 +227,7 @@ app.get('/collections/:id', async (req, res) => {
 
     const client = await pool.connect();
     await client.query('select * from all_collections where user_id_ = $1 order by created_at desc', [id]).then(result => {
-        if (result.rowCount > 1) {
+        if (result.rowCount > 0) {
             return res.status(200).send({
                 data: result.rows
             });
