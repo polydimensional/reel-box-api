@@ -38,6 +38,12 @@ app.get('/', (req, res) => {
     res.status(200).send('Welcome to Movie Challenge');
 });
 
+app.get('/wakeup', (req, res) => {
+    res.status(200).send({
+        msg: 'Thanks for waking me up :)'
+    });
+});
+
 app.get('/search_with_keyword', (req, res) => {
     const title = req.query.title;
     if (!title) {
