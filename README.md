@@ -27,7 +27,7 @@ node server.js /* To start the application */
 
 
 
-For Front-end modules, kindly refer to [this repo.](https://github.com/polydimensional/reel-box-app)
+For Front-end source code, kindly refer to [this repo.](https://github.com/polydimensional/reel-box-app)
 
 
 ## For Queries
