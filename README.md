@@ -2,6 +2,10 @@
 
 Reel-Box is a movie collection web application, allows users to share their movie collection with the friends much easier.
 
+## Live
+
+Access live demo of the application here - [https://reel--box.web.app/](https://reel--box.web.app)
+
 ## Installation
 
 Use the package manager [npm](https://npmjs.com/) to install all the required dependencies.
