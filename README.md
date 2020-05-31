@@ -1,42 +1,37 @@
-# Reel-Box
+# Reel-Box API
 
-Reel-Box is a movie collection web application, allows users to share their movie collection with the friends much easier.
+Reel-Box API handles the backend operation of the [Reel-box Application](https://github.com/polydimensional/reel-box-app/)
 
-## Live
-
-Access live demo of the application here - [https://reel--box.web.app/](https://reel--box.web.app)
 
 ## Installation
 
 Use the package manager [npm](https://npmjs.com/) to install all the required dependencies.
 
 ```bash
-git clone https://github.com/polydimensional/reel-box-app.git
+git clone https://github.com/polydimensional/reel-box-api.git
 cd reel-box-api
 npm i
 node server.js /* To start the application */
 ```
 
 ## Tech stack
-- Angular 9
-- NodeJS(Express) - API
-- Heroku Postgres - Primary Database
-- Firebase - Webapp Deployment
+- Express JS
+- PostgreSQL DB
 - Heroku - API Deployment
 
 
 ## Modules
-- New user authentication
-- Movie search
-- Movie list (Added movie collections)
-- URL generator
-- Movie collections page (Collection of movies)
-- Social sharing
+- Token generation (for the new user)
+- Movie search (with IMDB API)
+- Movie collections list (on PostgreSQL)
 
-For Front-end source code, kindly refer to [this repo.](https://github.com/polydimensional/reel-box-app)
+
+
+For Front-end modules, kindly refer to [this repo.](https://github.com/polydimensional/reel-box-app)
+
 
 ## For Queries
 Reach us at [polydimensional.in@gmail.com](mailto:polydimensional.in@gmail.com)
 
-## Developed by
-[Team Polydimensional](https://polydimensional.in)
+## Owned by
+[Polydimensional.in](https://polydimensional.in)
